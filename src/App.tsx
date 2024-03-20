@@ -16,47 +16,75 @@ const onEditorPreparing = (e: DataGridTypes.EditorPreparingEvent) => {
   }
 };
 
-const getFilteredCities = (options: { data?: Employee }) => ({
-  store: cities,
-  filter: options.data ? ["StateID", "=", options.data.StateID] : null,
-});
+// const getFilteredCities = (options: { data?: Employee }) => ({
+//   store: cities,
+//   filter: options.data ? ["StateID", "=", options.data.StateID] : null,
+// });
 
-function setStateValue(rowData: Employee, value) {
-  rowData.CityID = null;
-  this.defaultSetCellValue(rowData, value);
-}
+// function setStateValue(rowData: Employee, value) {
+//   rowData.CityID = null;
+//   this.defaultSetCellValue(rowData, value);
+// }
+
+const cellPrepared = (e) => {
+  if (e.rowType === "data") {
+    if (e.column.dataField === "Speed" && e.data.Speed > 60) {
+      e.cellElement.style.cssText = "color: white; background-color: red";
+      // or
+      e.cellElement.classList.add("my-class");
+    }
+  }
+};
+
+const renderGridCell = (rowData: any) => {
+  console.log(rowData);
+
+  if (rowData.data.StateID === 1) {
+    return <Lookup dataSource={states} displayExpr="Name" valueExpr="ID" />;
+  }
+
+  return <div>{rowData.value}</div>;
+};
 
 const App = () => (
-  <div id='data-grid-demo'>
+  <div id="data-grid-demo">
     <DataGrid
       dataSource={employees}
-      keyExpr='ID'
+      keyExpr="ID"
       showBorders={true}
-      onEditorPreparing={onEditorPreparing}
+      onCellPrepared={cellPrepared}
     >
-      <Editing mode='cell' allowUpdating={true} allowAdding={true}></Editing>
+      <Editing mode="cell" allowUpdating={true} allowAdding={true}></Editing>
 
       <Column
-        dataField='FirstName'
-        cellRender={(data) => {
-          console.log(data);
-          return <span style={{ color: "red" }}>{data?.data?.FirstName}</span>;
-        }}
+        dataField="FirstName"
+        alignment={"left"}
+        // cellRender={(data) => {
+        //   console.log(data);
+        //   return <span style={{ color: "red" }}>{data?.data?.FirstName}</span>;
+        // }}
       />
+
+      <Column dataField="Speed" alignment={"left"} />
 
       <Column
-        dataField='StateID'
-        caption='State'
-        cellTemplate={(data) => {
-          console.log(data);
-          return <Lookup dataSource={states} displayExpr='Name' valueExpr='ID' />
-        }}
-      />
-        
-      
+        dataField="StateID"
+        alignment={"left"}
+        caption="State"
+        cellRender={renderGridCell}
 
-      <Column dataField='CityID' caption='City'>
-        <Lookup dataSource={cities} displayExpr='Name' valueExpr='ID' />
+        // cellTemplate={(data) => {
+        //   console.log(data);
+        //   return (
+        //     <Lookup dataSource={states} displayExpr="Name" valueExpr="ID" />
+        //   );
+        // }}
+      >
+        {/* <Lookup dataSource={states} displayExpr="Name" valueExpr="ID" /> */}
+      </Column>
+
+      <Column dataField="CityID" caption="City">
+        <Lookup dataSource={cities} displayExpr="Name" valueExpr="ID" />
       </Column>
 
       {/* <Column
